@@ -4,8 +4,8 @@ import com.company.elixr.springbootapplicationwithdocker.constants.Constants;
 import com.company.elixr.springbootapplicationwithdocker.exception.BadRequestException;
 import com.company.elixr.springbootapplicationwithdocker.exception.FileStorageException;
 import com.company.elixr.springbootapplicationwithdocker.exception.NotFoundException;
-import com.company.elixr.springbootapplicationwithdocker.model.FileAccessByUserNameDTO;
 import com.company.elixr.springbootapplicationwithdocker.model.FileInfo;
+import com.company.elixr.springbootapplicationwithdocker.model.FileInfoDTO;
 import com.company.elixr.springbootapplicationwithdocker.repository.FileOperationRepository;
 import com.company.elixr.springbootapplicationwithdocker.responses.SuccessResponse;
 import com.company.elixr.springbootapplicationwithdocker.responses.SuccessResponseForGetById;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 public class FileOperationServiceImpl implements FileOperationService {
 
     private final FileOperationRepository fileOperationRepository;
-    private final FileInfo fileInfo;
+
     @Value(Constants.LOCAL_STORAGE_FOLDER_PATH)
     private String dirLocation;
 
@@ -54,13 +54,15 @@ public class FileOperationServiceImpl implements FileOperationService {
         if (Objects.equals(file.getContentType(), Constants.REQUIRED_FILE_TYPE)) {
             try {
                 String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+                FileInfo fileInfo = new FileInfo();
                 fileInfo.setFileName(fileName);
                 fileInfo.setUserName(userName);
                 UUID id = fileOperationRepository.save(fileInfo).getId();
                 Path resolvedPath = Path.of(dirLocation).resolve(String.valueOf(id));
                 Files.copy(file.getInputStream(), resolvedPath, StandardCopyOption.REPLACE_EXISTING);
                 fileOperationRepository.save(fileInfo);
-                return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.builder().status(Constants.STATUS).id(id).build());
+                return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.builder()
+                        .status(Constants.STATUS).id(id).build());
             } catch (IOException | NoSuchElementException e) {
                 throw new FileStorageException(Constants.ERROR_UPLOADING_FILE);
             }
@@ -74,7 +76,8 @@ public class FileOperationServiceImpl implements FileOperationService {
 
         if ((id.matches(Constants.UUID_FORMAT))) {
             UUID uuid = UUID.fromString(id);
-            FileInfo targetFileInfo = fileOperationRepository.findById(String.valueOf(uuid)).orElseThrow(() -> new NotFoundException(Constants.ERROR_NOT_FOUND));
+            FileInfo targetFileInfo = fileOperationRepository.findById(uuid).orElseThrow(()
+                    -> new NotFoundException(Constants.ERROR_NOT_FOUND));
             Path targetPath = Path.of(dirLocation).resolve(String.valueOf(uuid)).normalize();
             try {
                 Resource resource = new UrlResource(targetPath.toUri());
@@ -85,7 +88,12 @@ public class FileOperationServiceImpl implements FileOperationService {
                     while ((line = br.readLine()) != null) {
                         stringBuilder.append(line);
                     }
-                    return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponseForGetById(Constants.SUCCESS, SuccessResponse.builder().userName(targetFileInfo.getUserName()).fileName(targetFileInfo.getFileName()).timeOfUpload(targetFileInfo.getTimeOfUpload()).content(stringBuilder.toString()).build()));
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new SuccessResponseForGetById(Constants.SUCCESS,
+                                    SuccessResponse.builder().userName(targetFileInfo.getUserName())
+                                            .fileName(targetFileInfo
+                                                    .getFileName()).timeOfUpload(targetFileInfo.getTimeOfUpload())
+                                            .content(stringBuilder.toString()).build()));
                 } else {
                     throw new NotFoundException(Constants.ERROR_NOT_FOUND);
                 }
@@ -104,11 +112,14 @@ public class FileOperationServiceImpl implements FileOperationService {
         if (targetFileDetails.isEmpty()) {
             throw new NotFoundException(Constants.ERROR_NOT_FOUND);
         } else {
-            return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.builder().status(Constants.STATUS).userName(userName).files(targetFileDetails.stream().map(this::convertDataIntoDTO).collect(Collectors.toList())).build());
+            return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.builder().status(Constants.STATUS)
+                    .userName(userName).files(targetFileDetails.stream().map(this::convertDataIntoDTO)
+                            .collect(Collectors.toList())).build());
         }
     }
 
-    private FileAccessByUserNameDTO convertDataIntoDTO(FileInfo fileInfo) {
-        return FileAccessByUserNameDTO.builder().id(fileInfo.getId()).fileName(fileInfo.getFileName()).timeOfUpload(fileInfo.getTimeOfUpload()).build();
+    private FileInfoDTO convertDataIntoDTO(FileInfo fileInfo) {
+        return FileInfoDTO.builder().id(fileInfo.getId()).fileName(fileInfo.getFileName())
+                .timeOfUpload(fileInfo.getTimeOfUpload()).build();
     }
 }

@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.6.3'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'com.google.cloud.tools.jib' version '3.2.0'
 }
 
 group = 'com.company.elixr'
@@ -25,6 +26,9 @@ dependencies {
 	implementation 'org.eclipse.persistence:javax.persistence:2.2.1'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'junit:junit:4.13.1'
+	implementation 'org.projectlombok:lombok:1.18.20'
+    implementation 'org.organicdesign.testUtils:TestUtils:0.0.16'
+	implementation 'org.organicdesign:TestUtils:1.0.5'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

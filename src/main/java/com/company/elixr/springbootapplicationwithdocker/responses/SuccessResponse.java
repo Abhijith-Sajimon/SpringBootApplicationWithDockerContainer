@@ -1,6 +1,6 @@
 package com.company.elixr.springbootapplicationwithdocker.responses;
 
-import com.company.elixr.springbootapplicationwithdocker.model.FileAccessByUserNameDTO;
+import com.company.elixr.springbootapplicationwithdocker.model.FileInfoDTO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
@@ -20,5 +20,5 @@ public class SuccessResponse {
     private String fileName;
     private LocalDateTime timeOfUpload;
     private String content;
-    private List<FileAccessByUserNameDTO> files;
+    private List<FileInfoDTO> files;
 }
