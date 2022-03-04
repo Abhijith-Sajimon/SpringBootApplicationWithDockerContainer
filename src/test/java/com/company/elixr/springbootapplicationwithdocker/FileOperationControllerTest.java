@@ -76,7 +76,6 @@ public class FileOperationControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
-        Assert.assertEquals(200, result.getResponse().getStatus());
         Assert.assertNotNull(result.getResponse().getContentAsString());
     }
 
@@ -88,7 +87,6 @@ public class FileOperationControllerTest {
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/file/user/username")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-        Assert.assertEquals(200, result.getResponse().getStatus());
         Assert.assertNotNull(result.getResponse().getContentAsString());
     }
 }
