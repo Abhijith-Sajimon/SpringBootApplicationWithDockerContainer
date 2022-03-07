@@ -82,7 +82,7 @@ public class FileOperationServiceTest {
     }
 
     @Test
-    public void getFileById() {
+    public void test_getFileById() {
 
         UUID id = UUID.fromString("ebadf9b2-ea84-4683-bb32-a5bb4952e265");
         Mockito.when(fileOperationRepository.findById(Mockito.any(UUID.class)))
@@ -98,7 +98,7 @@ public class FileOperationServiceTest {
     }
 
     @Test
-    public void getFileById_IdNotInUUIDFormat() {
+    public void test_getFileById_IdNotInUUIDFormat() {
 
         try {
             String id = "ebadf9b2ea844683";
@@ -115,7 +115,7 @@ public class FileOperationServiceTest {
     }
 
     @Test
-    public void getFileById_NoRecordFound() {
+    public void test_getFileById_NoRecordFound() {
 
         UUID id = UUID.fromString("ebadf9b2-ea84-4683-bb32-a5bb4952e265");
         Mockito.when(fileOperationRepository.findById(Mockito.any(UUID.class)))
@@ -133,7 +133,7 @@ public class FileOperationServiceTest {
     }
 
     @Test
-    public void getFileByUsername() {
+    public void test_getFileByUsername() {
 
         Mockito.when(fileOperationRepository.findByUserName(Mockito.anyString()))
                 .thenReturn(fileInfoList);
@@ -146,7 +146,7 @@ public class FileOperationServiceTest {
     }
 
     @Test
-    public void getFileByUserName_NoRecordFound() {
+    public void test_getFileByUserName_NoRecordFound() {
 
         Mockito.when(fileOperationRepository.findByUserName(Mockito.anyString()))
                 .thenThrow(new NotFoundException(Constants.ERROR_NOT_FOUND));
