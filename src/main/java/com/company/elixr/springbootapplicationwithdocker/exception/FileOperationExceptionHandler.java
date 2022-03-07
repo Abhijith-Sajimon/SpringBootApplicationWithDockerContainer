@@ -25,8 +25,8 @@ public class FileOperationExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
     }
 
-    @ExceptionHandler(FileStorageException.class)
-    public ResponseEntity<Object> handleFileStorageException(FileStorageException exception) {
+    @ExceptionHandler(FileStorageAndAccessException.class)
+    public ResponseEntity<Object> handleFileStorageException(FileStorageAndAccessException exception) {
 
         ErrorResponse err = buildResponse(exception.getLocalizedMessage());
         return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body(err);
@@ -40,31 +40,31 @@ public class FileOperationExceptionHandler {
     }
 
     @ExceptionHandler(MissingServletRequestPartException.class)
-    public ResponseEntity<ErrorResponse> handleMissingServletRequestPartException(MissingServletRequestPartException exception) {
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestPartException() {
         ErrorResponse err = buildResponse(Constants.ERROR_BAD_REQUEST_SERVLET_REQUEST_PART_FILE_MISSING);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException exception) {
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException() {
         ErrorResponse err = buildResponse(Constants.ERROR_BAD_REQUEST_SERVLET_REQUEST_PART_USERNAME_MISSING);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException exception) {
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException() {
         ErrorResponse err = buildResponse(Constants.ERROR_BAD_REQUEST_REQUEST_PARAM_USERNAME_MISSING);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException exception) {
+    public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException() {
         ErrorResponse err = buildResponse(Constants.ERROR_BAD_REQUEST_FILE_NOT_PRESENT_OR_INVALID_FILE_TYPE);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleOtherExceptions(Exception exception) {
+    public ResponseEntity<ErrorResponse> handleOtherExceptions() {
         ErrorResponse err = buildResponse(Constants.ERROR_UNEXPECTED_TYPE);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
     }

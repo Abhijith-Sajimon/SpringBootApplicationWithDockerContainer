@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class FileStorageException extends RuntimeException {
+public class FileStorageAndAccessException extends RuntimeException {
 
     private String message;
 }

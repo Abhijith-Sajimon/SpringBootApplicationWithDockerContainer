@@ -13,4 +13,5 @@ public class FileInfoDTO {
     private UUID id;
     private String fileName;
     private LocalDateTime timeOfUpload;
+    private String statusOfFile;
 }

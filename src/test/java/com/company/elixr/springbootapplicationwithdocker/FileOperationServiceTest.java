@@ -1,12 +1,14 @@
 package com.company.elixr.springbootapplicationwithdocker;
 
 import com.company.elixr.springbootapplicationwithdocker.constants.Constants;
+import com.company.elixr.springbootapplicationwithdocker.exception.BadRequestException;
+import com.company.elixr.springbootapplicationwithdocker.exception.NotFoundException;
 import com.company.elixr.springbootapplicationwithdocker.model.FileInfo;
 import com.company.elixr.springbootapplicationwithdocker.repository.FileOperationRepository;
 import com.company.elixr.springbootapplicationwithdocker.responses.SuccessResponse;
 import com.company.elixr.springbootapplicationwithdocker.responses.SuccessResponseForGetById;
 import com.company.elixr.springbootapplicationwithdocker.service.FileOperationServiceImpl;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -56,10 +58,27 @@ public class FileOperationServiceTest {
                 "This is the file content".getBytes());
         Mockito.when(fileOperationRepository.save(Mockito.any(FileInfo.class))).thenReturn(fileInfo);
         ResponseEntity<SuccessResponse> created = fileOperationService.saveFile(sampleFile, "Natasha11");
-        Assert.assertNotNull(created);
-        Assert.assertEquals(HttpStatus.OK, created.getStatusCode());
-        Assert.assertEquals(Constants.STATUS, created.getBody().getStatus());
-        Assert.assertEquals(fileInfo.getId().getClass().getName(), created.getBody().getId().getClass().getName());
+        Assertions.assertNotNull(created);
+        Assertions.assertEquals(HttpStatus.OK, created.getStatusCode());
+        Assertions.assertEquals(Constants.STATUS, created.getBody().getStatus());
+        Assertions.assertEquals(fileInfo.getId().getClass().getName(), created.getBody().getId().getClass().getName());
+    }
+
+    @Test
+    void test_SaveFile_InvalidFileType() {
+
+        MockMultipartFile sampleFile = new MockMultipartFile("file", "testFile.json",
+                "application/json",
+                "This is the file content".getBytes());
+        Mockito.when(fileOperationRepository.save(Mockito.any(FileInfo.class))).thenReturn(fileInfo);
+        try
+        {
+            fileOperationService.saveFile(sampleFile, "Natasha11");
+        } catch (BadRequestException exception) {
+            Assertions.assertNotNull(exception);
+            Assertions.assertEquals(Constants.ERROR_BAD_REQUEST_FILE_NOT_PRESENT_OR_INVALID_FILE_TYPE,
+                    exception.getMessage());
+        }
     }
 
     @Test
@@ -70,12 +89,47 @@ public class FileOperationServiceTest {
                 .thenReturn(Optional.of(fileInfo));
         ResponseEntity<SuccessResponseForGetById> found = fileOperationService
                 .findFileById(String.valueOf(id));
-        Assert.assertNotNull(found);
-        Assert.assertEquals(HttpStatus.OK, found.getStatusCode());
-        Assert.assertEquals(2, found.getBody().getClass().getDeclaredFields().length);
-        Assert.assertEquals(Constants.SUCCESS, found.getBody().getSuccess());
-        Assert.assertEquals(fileInfo.getUserName(), found.getBody().getData().getUserName());
-        Assert.assertEquals(fileInfo.getFileName(), found.getBody().getData().getFileName());
+        Assertions.assertNotNull(found);
+        Assertions.assertEquals(HttpStatus.OK, found.getStatusCode());
+        Assertions.assertEquals(2, found.getBody().getClass().getDeclaredFields().length);
+        Assertions.assertEquals(Constants.SUCCESS, found.getBody().getSuccess());
+        Assertions.assertEquals(fileInfo.getUserName(), found.getBody().getData().getUserName());
+        Assertions.assertEquals(fileInfo.getFileName(), found.getBody().getData().getFileName());
+    }
+
+    @Test
+    public void getFileById_IdNotInUUIDFormat() {
+
+        try {
+            String id = "ebadf9b2ea844683";
+        Mockito.when(fileOperationRepository.findById(Mockito.any(UUID.class)))
+                .thenThrow(new BadRequestException(Constants.ERROR_BAD_REQUEST_INVALID_ID_FORMAT));
+            fileOperationService.findFileById(id);
+        } catch (Exception exception) {
+            Assertions.assertNotNull(exception);
+            Assertions.assertEquals((BadRequestException.class).getName(),
+                    exception.getClass().getName());
+            Assertions.assertEquals(Constants.ERROR_BAD_REQUEST_INVALID_ID_FORMAT,
+                    exception.getMessage());
+        }
+    }
+
+    @Test
+    public void getFileById_NoRecordFound() {
+
+        UUID id = UUID.fromString("ebadf9b2-ea84-4683-bb32-a5bb4952e265");
+        Mockito.when(fileOperationRepository.findById(Mockito.any(UUID.class)))
+                .thenThrow(new NotFoundException(Constants.ERROR_NOT_FOUND));
+        try {
+            fileOperationService
+                    .findFileById(String.valueOf(id));
+        } catch (Exception exception) {
+            Assertions.assertNotNull(exception);
+            Assertions.assertEquals((NotFoundException.class).getName(),
+                    exception.getClass().getName());
+            Assertions.assertEquals(Constants.ERROR_NOT_FOUND,
+                    exception.getMessage());
+        }
     }
 
     @Test
@@ -84,10 +138,27 @@ public class FileOperationServiceTest {
         Mockito.when(fileOperationRepository.findByUserName(Mockito.anyString()))
                 .thenReturn(fileInfoList);
         ResponseEntity<SuccessResponse> found = fileOperationService.findFileByUserName(fileInfo.getUserName());
-        Assert.assertNotNull(found);
-        Assert.assertEquals(HttpStatus.OK, found.getStatusCode());
-        Assert.assertEquals(Constants.STATUS, found.getBody().getStatus());
-        Assert.assertEquals(fileInfo.getUserName(), found.getBody().getUserName());
-        Assert.assertEquals(fileInfoList.get(0).getFileName(), found.getBody().getFiles().get(0).getFileName());
+        Assertions.assertNotNull(found);
+        Assertions.assertEquals(HttpStatus.OK, found.getStatusCode());
+        Assertions.assertEquals(Constants.STATUS, found.getBody().getStatus());
+        Assertions.assertEquals(fileInfo.getUserName(), found.getBody().getUserName());
+        Assertions.assertEquals(fileInfoList.get(0).getFileName(), found.getBody().getFiles().get(0).getFileName());
+    }
+
+    @Test
+    public void getFileByUserName_NoRecordFound() {
+
+        Mockito.when(fileOperationRepository.findByUserName(Mockito.anyString()))
+                .thenThrow(new NotFoundException(Constants.ERROR_NOT_FOUND));
+        try {
+            fileOperationService
+                    .findFileByUserName(fileInfo.getUserName());
+        } catch (Exception exception) {
+            Assertions.assertNotNull(exception);
+            Assertions.assertEquals((NotFoundException.class).getName(),
+                    exception.getClass().getName());
+            Assertions.assertEquals(Constants.ERROR_NOT_FOUND,
+                    exception.getMessage());
+        }
     }
 }

@@ -2,7 +2,7 @@ package com.company.elixr.springbootapplicationwithdocker.service;
 
 import com.company.elixr.springbootapplicationwithdocker.constants.Constants;
 import com.company.elixr.springbootapplicationwithdocker.exception.BadRequestException;
-import com.company.elixr.springbootapplicationwithdocker.exception.FileStorageException;
+import com.company.elixr.springbootapplicationwithdocker.exception.FileStorageAndAccessException;
 import com.company.elixr.springbootapplicationwithdocker.exception.NotFoundException;
 import com.company.elixr.springbootapplicationwithdocker.model.FileInfo;
 import com.company.elixr.springbootapplicationwithdocker.model.FileInfoDTO;
@@ -45,7 +45,7 @@ public class FileOperationServiceImpl implements FileOperationService {
         try {
             Files.createDirectories(Path.of(dirLocation));
         } catch (Exception ex) {
-            throw new FileStorageException(Constants.ERROR_CREATING_UPLOAD_DIRECTORY);
+            throw new FileStorageAndAccessException(Constants.ERROR_CREATING_UPLOAD_DIRECTORY);
         }
     }
 
@@ -64,7 +64,7 @@ public class FileOperationServiceImpl implements FileOperationService {
                 return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.builder()
                         .status(Constants.STATUS).id(id).build());
             } catch (IOException | NoSuchElementException e) {
-                throw new FileStorageException(Constants.ERROR_UPLOADING_FILE);
+                throw new FileStorageAndAccessException(Constants.ERROR_UPLOADING_FILE);
             }
         } else {
             throw new BadRequestException(Constants.ERROR_BAD_REQUEST_FILE_NOT_PRESENT_OR_INVALID_FILE_TYPE);
@@ -76,8 +76,8 @@ public class FileOperationServiceImpl implements FileOperationService {
 
         if ((id.matches(Constants.UUID_FORMAT))) {
             UUID uuid = UUID.fromString(id);
-            FileInfo targetFileInfo = fileOperationRepository.findById(uuid).orElseThrow(()
-                    -> new NotFoundException(Constants.ERROR_NOT_FOUND));
+            FileInfo targetFileInfo = fileOperationRepository.findById(uuid).orElseThrow(() ->
+                    new NotFoundException(Constants.ERROR_NOT_FOUND));
             Path targetPath = Path.of(dirLocation).resolve(String.valueOf(uuid)).normalize();
             try {
                 Resource resource = new UrlResource(targetPath.toUri());
@@ -88,14 +88,18 @@ public class FileOperationServiceImpl implements FileOperationService {
                     while ((line = br.readLine()) != null) {
                         stringBuilder.append(line);
                     }
-                    return ResponseEntity.status(HttpStatus.OK)
-                            .body(new SuccessResponseForGetById(Constants.SUCCESS,
-                                    SuccessResponse.builder().userName(targetFileInfo.getUserName())
-                                            .fileName(targetFileInfo
-                                                    .getFileName()).timeOfUpload(targetFileInfo.getTimeOfUpload())
-                                            .content(stringBuilder.toString()).build()));
+                    return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponseForGetById(Constants.SUCCESS,
+                            SuccessResponse.builder().userName(targetFileInfo.getUserName())
+                                    .fileName(targetFileInfo.getFileName())
+                                    .timeOfUpload(targetFileInfo.getTimeOfUpload())
+                                    .content(stringBuilder.toString())
+                                    .statusOfFile(Constants.FILE_PRESENT_IN_THE_SYSTEM).build()));
                 } else {
-                    throw new NotFoundException(Constants.ERROR_NOT_FOUND);
+                    return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponseForGetById(Constants.SUCCESS,
+                            SuccessResponse.builder().userName(targetFileInfo.getUserName())
+                                    .fileName(targetFileInfo.getFileName())
+                                    .timeOfUpload(targetFileInfo.getTimeOfUpload())
+                                    .statusOfFile(Constants.FILE_NOT_PRESENT_IN_THE_SYSTEM).build()));
                 }
             } catch (IOException | NoSuchElementException e) {
                 throw new NotFoundException(Constants.ERROR_NOT_FOUND);
@@ -112,14 +116,28 @@ public class FileOperationServiceImpl implements FileOperationService {
         if (targetFileDetails.isEmpty()) {
             throw new NotFoundException(Constants.ERROR_NOT_FOUND);
         } else {
-            return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.builder().status(Constants.STATUS)
-                    .userName(userName).files(targetFileDetails.stream().map(this::convertDataIntoDTO)
-                            .collect(Collectors.toList())).build());
+            return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.builder()
+                    .status(Constants.STATUS).userName(userName).files(targetFileDetails.stream().
+                            map(this::convertDataIntoDTO).collect(Collectors.toList())).build());
         }
     }
 
     private FileInfoDTO convertDataIntoDTO(FileInfo fileInfo) {
-        return FileInfoDTO.builder().id(fileInfo.getId()).fileName(fileInfo.getFileName())
-                .timeOfUpload(fileInfo.getTimeOfUpload()).build();
+
+        Path targetPath = Path.of(dirLocation).resolve(String.valueOf(fileInfo.getId())).normalize();
+        try {
+            Resource resource = new UrlResource(targetPath.toUri());
+            if (resource.exists() || resource.isReadable()) {
+                return FileInfoDTO.builder().id(fileInfo.getId()).fileName(fileInfo.getFileName())
+                        .timeOfUpload(fileInfo.getTimeOfUpload())
+                        .statusOfFile(Constants.FILE_PRESENT_IN_THE_SYSTEM).build();
+            } else {
+                return FileInfoDTO.builder().id(fileInfo.getId()).fileName(fileInfo.getFileName())
+                        .timeOfUpload(fileInfo.getTimeOfUpload())
+                        .statusOfFile(Constants.FILE_NOT_PRESENT_IN_THE_SYSTEM).build();
+            }
+        } catch (Exception exception) {
+            throw new FileStorageAndAccessException(Constants.ERROR_INVALID_URL_PATH);
+        }
     }
 }

@@ -6,8 +6,8 @@ import com.company.elixr.springbootapplicationwithdocker.model.FileInfo;
 import com.company.elixr.springbootapplicationwithdocker.responses.SuccessResponse;
 import com.company.elixr.springbootapplicationwithdocker.responses.SuccessResponseForGetById;
 import com.company.elixr.springbootapplicationwithdocker.service.FileOperationService;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -24,6 +24,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import java.nio.charset.StandardCharsets;
 
 @RunWith(MockitoJUnitRunner.class)
 @WebMvcTest(FileOperationController.class)
@@ -47,18 +49,65 @@ public class FileOperationControllerTest {
 
         MockMultipartFile sampleFile = new MockMultipartFile("file", "testFile.txt",
                 "text/plain",
-                "This is the file content".getBytes());
+                "This is the file content".getBytes(StandardCharsets.UTF_8));
+
         mockMvc.perform(MockMvcRequestBuilders.multipart("/upload")
                         .file(sampleFile)
+                        .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8")
                         .param("username", "Alex12"))
-                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
     public void test_UploadFile_NoFileProvided() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/upload"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    public void test_UploadFile_RequestPart_File_Missing() throws Exception {
+
+        MockMultipartFile sampleFile = new MockMultipartFile("_", "testFile.txt",
+                "text/plain",
+                "This is the file content".getBytes(StandardCharsets.UTF_8));
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/upload")
+                        .file(sampleFile)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+                        .param("username", "Alex12"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    public void test_UploadFile_RequestPart_UserName_Missing() throws Exception {
+
+        MockMultipartFile sampleFile = new MockMultipartFile("_", "testFile.txt",
+                "document",
+                "This is the file content".getBytes(StandardCharsets.UTF_8));
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/upload")
+                        .file(sampleFile)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+                        .param("_", "Alex12"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    public void test_UploadFile_RequestParam_UserNameMissing() throws Exception {
+
+        MockMultipartFile sampleFile = new MockMultipartFile("file", "testFile.txt",
+                "text/plain",
+                "This is the file content".getBytes(StandardCharsets.UTF_8));
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/upload")
+                        .file(sampleFile)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+                        .param("username", ""))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
@@ -76,7 +125,7 @@ public class FileOperationControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
-        Assert.assertNotNull(result.getResponse().getContentAsString());
+        Assertions.assertNotNull(result.getResponse().getContentAsString());
     }
 
     @Test
@@ -87,6 +136,6 @@ public class FileOperationControllerTest {
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/file/user/username")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-        Assert.assertNotNull(result.getResponse().getContentAsString());
+        Assertions.assertNotNull(result.getResponse().getContentAsString());
     }
 }

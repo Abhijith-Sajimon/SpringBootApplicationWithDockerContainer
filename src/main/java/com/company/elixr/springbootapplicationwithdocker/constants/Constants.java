@@ -11,7 +11,10 @@ public class Constants {
     public static final String FAILURE = "false";
     public static final String REQUIRED_FILE_TYPE = "text/plain";
     public static final String LOCAL_STORAGE_FOLDER_PATH = "${file.upload-dir}";
+    public static final String FILE_PRESENT_IN_THE_SYSTEM = "Present";
+    public static final String FILE_NOT_PRESENT_IN_THE_SYSTEM = "Absent";
     public static final String ERROR_CREATING_UPLOAD_DIRECTORY = "Could not create upload directory";
+    public static final String ERROR_INVALID_URL_PATH = "Invalid URL path";
     public static final String ERROR_UPLOADING_FILE = "Could not upload file";
     public static final String ERROR_NOT_FOUND = "No record found";
     public static final String ERROR_BAD_REQUEST_FILE_NOT_PRESENT_OR_INVALID_FILE_TYPE = "No file is chosen in the multipart form or chosen file type is invalid";

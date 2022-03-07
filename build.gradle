@@ -2,9 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.6.3'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
-//	id 'com.google.cloud.tools.jib' version '3.2.0'
 }
-//jib.to.image = 'gcr.io/my-project/image-built-with-jib'
 
 group = 'com.company.elixr'
 version = '0.0.1-SNAPSHOT'
@@ -30,6 +28,7 @@ dependencies {
 	implementation 'org.projectlombok:lombok:1.18.20'
     implementation 'org.organicdesign.testUtils:TestUtils:0.0.16'
 	implementation 'org.organicdesign:TestUtils:1.0.5'
+	implementation 'name.dmaus.schxslt:testsuite:1.8.2'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
