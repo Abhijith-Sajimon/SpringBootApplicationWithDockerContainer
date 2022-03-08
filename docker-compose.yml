@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+
+  my-custom-springboot-app:
+    image: spring-boot-docker-application.jar
+    container_name: Spring-Boot-Application-For-File-Operations
+    ports:
+      - "8080:8080"
+
+  database:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: trainingPoc

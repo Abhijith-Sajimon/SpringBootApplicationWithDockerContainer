@@ -20,6 +20,5 @@ public class SuccessResponse {
     private String fileName;
     private LocalDateTime timeOfUpload;
     private String content;
-    private boolean isFilePresent;
     private List<FileInfoDTO> files;
 }
