@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -40,7 +41,7 @@ public class FileOperationServiceImpl implements FileOperationService {
     @Value(Constants.LOCAL_STORAGE_FOLDER_PATH)
     private String dirLocation;
 
-    @Override
+    @PostConstruct
     public void init() {
         try {
             Files.createDirectories(Path.of(dirLocation));
@@ -74,7 +75,7 @@ public class FileOperationServiceImpl implements FileOperationService {
     @Override
     public ResponseEntity<SuccessResponseForGetById> findFileById(String id) {
 
-        if ((id.matches(Constants.UUID_FORMAT))) {
+        try {
             UUID uuid = UUID.fromString(id);
             FileInfo targetFileInfo = fileOperationRepository.findById(uuid).orElseThrow(() ->
                     new NotFoundException(Constants.ERROR_NOT_FOUND));
@@ -104,7 +105,7 @@ public class FileOperationServiceImpl implements FileOperationService {
             } catch (IOException | NoSuchElementException e) {
                 throw new NotFoundException(Constants.ERROR_NOT_FOUND);
             }
-        } else {
+        } catch(IllegalArgumentException exception) {
             throw new BadRequestException(Constants.ERROR_BAD_REQUEST_INVALID_ID_FORMAT);
         }
     }
@@ -130,11 +131,11 @@ public class FileOperationServiceImpl implements FileOperationService {
             if (resource.exists() || resource.isReadable()) {
                 return FileInfoDTO.builder().id(fileInfo.getId()).fileName(fileInfo.getFileName())
                         .timeOfUpload(fileInfo.getTimeOfUpload())
-                        .statusOfFile(Constants.FILE_PRESENT_IN_THE_SYSTEM).build();
+                        .isFilePresent(true).build();
             } else {
                 return FileInfoDTO.builder().id(fileInfo.getId()).fileName(fileInfo.getFileName())
                         .timeOfUpload(fileInfo.getTimeOfUpload())
-                        .statusOfFile(Constants.FILE_NOT_PRESENT_IN_THE_SYSTEM).build();
+                        .isFilePresent(false).build();
             }
         } catch (Exception exception) {
             throw new FileStorageAndAccessException(Constants.ERROR_INVALID_URL_PATH);

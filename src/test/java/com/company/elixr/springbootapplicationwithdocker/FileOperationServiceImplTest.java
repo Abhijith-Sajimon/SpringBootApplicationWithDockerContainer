@@ -30,7 +30,7 @@ import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
 @WebMvcTest(FileOperationServiceImpl.class)
-public class FileOperationServiceTest {
+public class FileOperationServiceImplTest {
 
     List<FileInfo> fileInfoList = new ArrayList<>();
     @MockBean
@@ -70,12 +70,16 @@ public class FileOperationServiceTest {
         MockMultipartFile sampleFile = new MockMultipartFile("file", "testFile.json",
                 "application/json",
                 "This is the file content".getBytes());
-        Mockito.when(fileOperationRepository.save(Mockito.any(FileInfo.class))).thenReturn(fileInfo);
+        Mockito.when(fileOperationRepository.save(Mockito.any(FileInfo.class)))
+                .thenThrow(new BadRequestException(Constants.ERROR_BAD_REQUEST_FILE_NOT_PRESENT_OR_INVALID_FILE_TYPE));
         try
         {
             fileOperationService.saveFile(sampleFile, "Natasha11");
+            Assertions.fail("Since no exception was thrown");
         } catch (BadRequestException exception) {
             Assertions.assertNotNull(exception);
+            Assertions.assertEquals((BadRequestException.class).getName(),
+                    exception.getClass().getName());
             Assertions.assertEquals(Constants.ERROR_BAD_REQUEST_FILE_NOT_PRESENT_OR_INVALID_FILE_TYPE,
                     exception.getMessage());
         }
@@ -100,12 +104,13 @@ public class FileOperationServiceTest {
     @Test
     public void test_getFileById_IdNotInUUIDFormat() {
 
-        try {
-            String id = "ebadf9b2ea844683";
+        String id = "ebadf9b2ea844683";
         Mockito.when(fileOperationRepository.findById(Mockito.any(UUID.class)))
                 .thenThrow(new BadRequestException(Constants.ERROR_BAD_REQUEST_INVALID_ID_FORMAT));
+        try {
             fileOperationService.findFileById(id);
-        } catch (Exception exception) {
+            Assertions.fail("Since no exception was thrown");
+        } catch (BadRequestException exception) {
             Assertions.assertNotNull(exception);
             Assertions.assertEquals((BadRequestException.class).getName(),
                     exception.getClass().getName());
@@ -121,9 +126,9 @@ public class FileOperationServiceTest {
         Mockito.when(fileOperationRepository.findById(Mockito.any(UUID.class)))
                 .thenThrow(new NotFoundException(Constants.ERROR_NOT_FOUND));
         try {
-            fileOperationService
-                    .findFileById(String.valueOf(id));
-        } catch (Exception exception) {
+            fileOperationService.findFileById(String.valueOf(id));
+            Assertions.fail("Since no exception was thrown");
+        } catch (NotFoundException exception) {
             Assertions.assertNotNull(exception);
             Assertions.assertEquals((NotFoundException.class).getName(),
                     exception.getClass().getName());
@@ -151,9 +156,9 @@ public class FileOperationServiceTest {
         Mockito.when(fileOperationRepository.findByUserName(Mockito.anyString()))
                 .thenThrow(new NotFoundException(Constants.ERROR_NOT_FOUND));
         try {
-            fileOperationService
-                    .findFileByUserName(fileInfo.getUserName());
-        } catch (Exception exception) {
+            fileOperationService.findFileByUserName(fileInfo.getUserName());
+            Assertions.fail("Since no exception was thrown");
+        } catch (NotFoundException exception) {
             Assertions.assertNotNull(exception);
             Assertions.assertEquals((NotFoundException.class).getName(),
                     exception.getClass().getName());

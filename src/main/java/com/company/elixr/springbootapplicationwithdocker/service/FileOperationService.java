@@ -5,13 +5,7 @@ import com.company.elixr.springbootapplicationwithdocker.responses.SuccessRespon
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.PostConstruct;
-
-
 public interface FileOperationService {
-
-    @PostConstruct
-    void init();
 
     ResponseEntity<SuccessResponse> saveFile(MultipartFile file, String userName);
 

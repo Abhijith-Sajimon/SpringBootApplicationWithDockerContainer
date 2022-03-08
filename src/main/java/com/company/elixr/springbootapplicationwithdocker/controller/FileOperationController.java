@@ -1,5 +1,6 @@
 package com.company.elixr.springbootapplicationwithdocker.controller;
 
+import com.company.elixr.springbootapplicationwithdocker.model.FileInfo;
 import com.company.elixr.springbootapplicationwithdocker.responses.SuccessResponse;
 import com.company.elixr.springbootapplicationwithdocker.responses.SuccessResponseForGetById;
 import com.company.elixr.springbootapplicationwithdocker.service.FileOperationService;
@@ -23,7 +24,7 @@ public class FileOperationController {
 
     private final FileOperationService fileService;
 
-    @PostMapping(value = "/upload")
+    @PostMapping("/upload")
     public ResponseEntity<SuccessResponse> uploadFile(@RequestParam(value = "file") MultipartFile file,
                                                       @RequestParam(value = "username") @NotEmpty String userName) {
         return fileService.saveFile(file, userName);

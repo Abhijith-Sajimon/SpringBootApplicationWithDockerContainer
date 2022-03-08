@@ -9,5 +9,4 @@ public class SuccessResponseForGetById {
 
     private String success;
     private SuccessResponse data;
-
 }
