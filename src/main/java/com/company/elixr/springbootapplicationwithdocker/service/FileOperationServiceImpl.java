@@ -82,7 +82,6 @@ public class FileOperationServiceImpl implements FileOperationService {
             Path targetPath = Path.of(dirLocation).resolve(String.valueOf(uuid)).normalize();
             try {
                 Resource resource = new UrlResource(targetPath.toUri());
-                if (resource.exists() || resource.isReadable()) {
                     StringBuilder stringBuilder = new StringBuilder();
                     BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()));
                     String line;
@@ -95,15 +94,8 @@ public class FileOperationServiceImpl implements FileOperationService {
                                     .timeOfUpload(targetFileInfo.getTimeOfUpload())
                                     .content(stringBuilder.toString())
                                     .build()));
-                } else {
-                    return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponseForGetById(Constants.SUCCESS,
-                            SuccessResponse.builder().userName(targetFileInfo.getUserName())
-                                    .fileName(targetFileInfo.getFileName())
-                                    .timeOfUpload(targetFileInfo.getTimeOfUpload())
-                                    .build()));
-                }
-            } catch (IOException | NoSuchElementException e) {
-                throw new NotFoundException(Constants.ERROR_NOT_FOUND);
+            } catch (IOException exception) {
+                throw new FileStorageAndAccessException(Constants.ERROR_FILE_DOES_NOT_EXIST);
             }
         } catch(IllegalArgumentException exception) {
             throw new BadRequestException(Constants.ERROR_BAD_REQUEST_INVALID_ID_FORMAT);

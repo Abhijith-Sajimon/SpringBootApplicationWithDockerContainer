@@ -11,8 +11,8 @@ public class Constants {
     public static final String FAILURE = "false";
     public static final String REQUIRED_FILE_TYPE = "text/plain";
     public static final String LOCAL_STORAGE_FOLDER_PATH = "${file.upload-dir}";
-    public static final String FILE_PRESENT_IN_THE_SYSTEM = "Present";
-    public static final String FILE_NOT_PRESENT_IN_THE_SYSTEM = "Absent";
+    public static final String ERROR_FILE_DOES_NOT_EXIST = "File is not present in the " +
+            "local directory";
     public static final String ERROR_CREATING_UPLOAD_DIRECTORY = "Could not create upload directory";
     public static final String ERROR_INVALID_URL_PATH = "Invalid URL path";
     public static final String ERROR_UPLOADING_FILE = "Could not upload file";
