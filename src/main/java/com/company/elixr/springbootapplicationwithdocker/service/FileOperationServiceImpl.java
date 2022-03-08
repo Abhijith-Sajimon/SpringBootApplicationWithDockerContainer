@@ -94,13 +94,13 @@ public class FileOperationServiceImpl implements FileOperationService {
                                     .fileName(targetFileInfo.getFileName())
                                     .timeOfUpload(targetFileInfo.getTimeOfUpload())
                                     .content(stringBuilder.toString())
-                                    .statusOfFile(Constants.FILE_PRESENT_IN_THE_SYSTEM).build()));
+                                    .isFilePresent(true).build()));
                 } else {
                     return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponseForGetById(Constants.SUCCESS,
                             SuccessResponse.builder().userName(targetFileInfo.getUserName())
                                     .fileName(targetFileInfo.getFileName())
                                     .timeOfUpload(targetFileInfo.getTimeOfUpload())
-                                    .statusOfFile(Constants.FILE_NOT_PRESENT_IN_THE_SYSTEM).build()));
+                                    .isFilePresent(false).build()));
                 }
             } catch (IOException | NoSuchElementException e) {
                 throw new NotFoundException(Constants.ERROR_NOT_FOUND);
