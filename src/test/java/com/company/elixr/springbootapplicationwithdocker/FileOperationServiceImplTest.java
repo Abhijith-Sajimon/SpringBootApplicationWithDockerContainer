@@ -88,7 +88,7 @@ public class FileOperationServiceImplTest {
     @Test
     public void test_getFileById() {
 
-        UUID id = UUID.fromString("ebadf9b2-ea84-4683-bb32-a5bb4952e265");
+        UUID id = UUID.fromString("07ecb4bb-b804-46fc-a5c6-fca0ba2d7733");
         Mockito.when(fileOperationRepository.findById(Mockito.any(UUID.class)))
                 .thenReturn(Optional.of(fileInfo));
         ResponseEntity<SuccessResponseForGetById> found = fileOperationService

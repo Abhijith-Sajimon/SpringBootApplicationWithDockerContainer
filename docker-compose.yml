@@ -1,15 +1,33 @@
 version: "3.8"
 services:
 
-  my-custom-springboot-app:
-    image: spring-boot-docker-application.jar
-    container_name: Spring-Boot-Application-For-File-Operations
+  api_service:
+    image: spring-boot-docker-application
+    container_name: spring-boot-docker-application-container
+    restart: unless-stopped
     ports:
       - "8080:8080"
+    links:
+      - database
+    depends_on:
+      - database
+    volumes:
+      - app-data:/spring_boot_app_local
 
   database:
     image: mongo:latest
-    container_name: mongodb
+    container_name: mongodb-container
     restart: always
-    environment:
-      MONGO_INITDB_DATABASE: trainingPoc
+    ports:
+       - "27017:27017"
+    volumes:
+      - db-data:/data/db
+
+volumes:
+  app-data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: C:\Users\WIIS\spring_boot_app_local
+  db-data:

@@ -37,4 +37,4 @@ out/
 ### VS Code ###
 .vscode/
 !/.idea/
-!/SpringBootDockerApplication_LocalStorage/
+!/spring_boot_docker_application/

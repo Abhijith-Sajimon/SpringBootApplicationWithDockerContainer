@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.6.3'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'com.google.cloud.tools.jib' version '3.2.0'
 }
 
 group = 'com.company.elixr'
@@ -21,7 +22,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-    implementation 'com.jamierf.db-table:db-table-core:0.1'
     implementation 'org.eclipse.persistence:javax.persistence:2.2.1'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'junit:junit:4.13.2'
@@ -33,9 +33,23 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-jar {
-    manifest {
-        attributes 'Main-Class': 'com.company.elixr.springbootapplicationwithdocker.SpringBootDockerApplication'
+tasks {
+    build {
+        dependsOn(tasks.jib)
+    }
+}
+
+jib {
+    from {
+        image = 'openjdk:17'
+    }
+    to {
+        image = 'spring-boot-docker-application'
+        tags = ['latest']
+    }
+    container {
+        ports = ['8080']
+        workingDirectory = '/spring_boot_app_local'
     }
 }
 

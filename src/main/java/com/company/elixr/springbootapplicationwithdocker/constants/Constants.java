@@ -23,6 +23,7 @@ public class Constants {
     public static final String ERROR_BAD_REQUEST_INVALID_ID_FORMAT = "id is not in UUID format";
     public static final String ERROR_BAD_REQUEST_SERVLET_REQUEST_PART_FILE_MISSING = "Servlet request part 'file' " +
             "missing";
+    public static final String ERROR_BAD_REQUEST_MAX_UPLOAD_SIZE_EXCEEDED = "File size exceeds maximum upload limit";
     public static final String ERROR_BAD_REQUEST_SERVLET_REQUEST_PART_USERNAME_MISSING = "Servlet request part " +
             "'username' missing";
     public static final String ERROR_BAD_REQUEST_REQUEST_PARAM_USERNAME_MISSING = "Username is a mandatory field";
