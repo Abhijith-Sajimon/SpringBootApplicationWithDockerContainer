@@ -78,27 +78,25 @@ public class FileOperationServiceImpl implements FileOperationService {
 
         try {
             UUID uuid = UUID.fromString(id);
-            FileInfo targetFileInfo = fileOperationRepository.findById(uuid).orElseThrow(() ->
-                    new NotFoundException(Constants.ERROR_NOT_FOUND));
+            FileInfo targetFileInfo = fileOperationRepository.findById(uuid).orElseThrow(()
+                    -> new NotFoundException(Constants.ERROR_NOT_FOUND));
             Path targetPath = Path.of(dirLocation).resolve(String.valueOf(uuid)).normalize();
             try {
                 Resource resource = new UrlResource(targetPath.toUri());
-                    StringBuilder stringBuilder = new StringBuilder();
-                    BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()));
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        stringBuilder.append(line);
-                    }
-                    return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponseForGetById(Constants.SUCCESS,
-                            SuccessResponse.builder().userName(targetFileInfo.getUserName())
-                                    .fileName(targetFileInfo.getFileName())
-                                    .timeOfUpload(targetFileInfo.getTimeOfUpload())
-                                    .content(stringBuilder.toString())
-                                    .build()));
+                StringBuilder stringBuilder = new StringBuilder();
+                BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    stringBuilder.append(line);
+                }
+                return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponseForGetById(Constants.SUCCESS,
+                        SuccessResponse.builder().userName(targetFileInfo.getUserName())
+                                .fileName(targetFileInfo.getFileName()).timeOfUpload(targetFileInfo.getTimeOfUpload())
+                                .content(stringBuilder.toString()).build()));
             } catch (IOException exception) {
                 throw new FileStorageAndAccessException(Constants.ERROR_FILE_DOES_NOT_EXIST);
             }
-        } catch(IllegalArgumentException exception) {
+        } catch (IllegalArgumentException exception) {
             throw new BadRequestException(Constants.ERROR_BAD_REQUEST_INVALID_ID_FORMAT);
         }
     }
@@ -110,9 +108,9 @@ public class FileOperationServiceImpl implements FileOperationService {
         if (targetFileDetails.isEmpty()) {
             throw new NotFoundException(Constants.ERROR_NOT_FOUND);
         } else {
-            return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.builder()
-                    .status(Constants.STATUS).userName(userName).files(targetFileDetails.stream().
-                            map(this::convertDataIntoDTO).collect(Collectors.toList())).build());
+            return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.builder().status(Constants.STATUS)
+                    .userName(userName).files(targetFileDetails.stream()
+                            .map(this::convertDataIntoDTO).collect(Collectors.toList())).build());
         }
     }
 
@@ -123,12 +121,10 @@ public class FileOperationServiceImpl implements FileOperationService {
             Resource resource = new UrlResource(targetPath.toUri());
             if (resource.exists() || resource.isReadable()) {
                 return FileInfoDTO.builder().id(fileInfo.getId()).fileName(fileInfo.getFileName())
-                        .timeOfUpload(fileInfo.getTimeOfUpload())
-                        .isFilePresent(true).build();
+                        .timeOfUpload(fileInfo.getTimeOfUpload()).isFilePresent(true).build();
             } else {
                 return FileInfoDTO.builder().id(fileInfo.getId()).fileName(fileInfo.getFileName())
-                        .timeOfUpload(fileInfo.getTimeOfUpload())
-                        .isFilePresent(false).build();
+                        .timeOfUpload(fileInfo.getTimeOfUpload()).isFilePresent(false).build();
             }
         } catch (Exception exception) {
             throw new FileStorageAndAccessException(Constants.ERROR_INVALID_URL_PATH);

@@ -85,20 +85,15 @@ public class FileOperationControllerTest {
     @Test
     public void test_UploadFile_RequestParam_NoFileChosenInTheMultipartForm() throws Exception {
 
-        MockMultipartFile sampleFile = new MockMultipartFile("file", "",
-                "text/plain",
-                "This is the file content".getBytes(StandardCharsets.UTF_8));
-
         mockMvc.perform(MockMvcRequestBuilders.multipart("/upload")
-                        .file(sampleFile)
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8")
-                        .param("username", ""))
+                        .param("username", "Alex12"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
-    public void test_UploadFile_IncorrectServletRequestPart() throws Exception {
+    public void test_UploadFile_IncorrectFileParameterName() throws Exception {
 
         MockMultipartFile sampleFile = new MockMultipartFile("_", "testFile.txt",
                 "text/plain",
