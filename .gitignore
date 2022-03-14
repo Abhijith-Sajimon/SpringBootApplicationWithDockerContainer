@@ -37,3 +37,4 @@ out/
 ### VS Code ###
 .vscode/
 !/.idea/
+!/spring_boot_docker_application/
